@@ -1,66 +1,74 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select Terraform action')
-    }
-
-    environment {
-        SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
-    }
-
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Set Terraform Path') {
             steps {
                 script {
-                    def tfHome = tool name: 'Terraform'
-                    env.PATH = "${tfHome}:${env.PATH}"
+                    // Set up the Terraform path if needed
                 }
-                sh 'pwd'
-                sh "echo ${SVC_ACCOUNT_KEY} | base64 -d > ./terraform.json"
-                sh 'terraform --version'               
             }
         }
-
+        
         stage('Set Up Service Account and Auth') {
             steps {
-                sh 'bash setup_service_account.sh'
+                script {
+                    // Your existing script to set up service account
+                    sh 'bash setup_service_account.sh'
+                }
             }
         }
-
+        
         stage('Create Instance Template with NGINX') {
             steps {
-                sh 'bash create_instance_template.sh'
+                script {
+                    // Your existing script to create instance template
+                    sh 'bash create_instance_template.sh'
+                }
+            }
+        }
+        
+        stage('Create Managed Instance Group') {
+            steps {
+                script {
+                    // Your existing script to create managed instance group
+                    sh 'bash create_managed_instance_group.sh'
+                }
             }
         }
 
-        stage('Create Managed Instance Group') {
+        // New stage to destroy existing resources before applying Terraform
+        stage('Terraform Destroy') {
             steps {
-                sh 'bash create_managed_instance_group.sh'
+                script {
+                    // Destroy existing resources (MIG and instance template)
+                    sh 'terraform destroy -auto-approve'
+                }
             }
         }
 
         stage('Initialize Terraform') {
             steps {
-                sh 'terraform init'
+                script {
+                    // Initialize Terraform
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Terraform Action') {
             steps {
                 script {
-                    if (params.ACTION == 'destroy') {
-                        input 'Proceed to Destroy Resources?'
-                    }
+                    // Apply Terraform changes
+                    sh 'terraform apply --auto-approve'
                 }
-                sh "terraform ${params.ACTION} --auto-approve"
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline finished.'
         }
     }
 }
