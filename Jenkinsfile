@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select Terraform action')
+    }
+
     environment {
         SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
     }
@@ -56,7 +60,6 @@ pipeline {
 
     post {
         always {
-            // Optional: Clean up or log outputs
             echo 'Pipeline finished.'
         }
     }
