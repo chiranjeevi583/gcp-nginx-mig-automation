@@ -10,14 +10,18 @@ pipeline {
     }
 
     stages {
-        stage('Set Terraform path') {
+          
+
+	stage('Set Terraform path') {
             steps {
                 script {
-                    // Set the PATH to include the Terraform binary location
-                    env.PATH = "/usr/bin:${env.PATH}"
+                    def tfHome = tool name: 'Terraform'
+                    env.PATH = "${tfHome}:${env.PATH}"
                 }
-                // Verify that Terraform is accessible
-                sh 'Terraform --version'
+		    sh 'pwd'
+                sh 'echo $SVC_ACCOUNT_KEY | base64 -d > ./terraform.json'
+                sh 'terraform --version'               
+               
             }
         }
 
@@ -38,7 +42,19 @@ pipeline {
                 sh 'bash create_managed_instance_group.sh'
             }
         }
-
+         stage('Initialize Terraform') {
+		  steps {
+		 
+                sh 'terraform init'
+	 }
+	 }
+		
+	stage('Terraform plan') {
+		 steps {
+		
+		 sh 'terraform plan'
+	}
+	}
         stage('Terraform Action') {
             steps {
                 script {
