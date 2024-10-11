@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Set Terraform path') {
+        stage('Set Terraform Path') {
             steps {
                 script {
                     def tfHome = tool name: 'Terraform'
@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Set up Service Account and Auth') {
+        stage('Set Up Service Account and Auth') {
             steps {
                 sh 'bash setup_service_account.sh'
             }
@@ -35,36 +35,29 @@ pipeline {
                 sh 'bash create_managed_instance_group.sh'
             }
         }
-        
+
         stage('Initialize Terraform') {
             steps {
                 sh 'terraform init'
             }
         }
 
-        stage('Destroy Existing Instance Template') {
-            steps {
-                script {
-                    // Only run if ACTION is 'apply'
-                    if (params.ACTION == 'apply') {
-                        def destroyResult = sh(script: "terraform destroy -auto-approve -target=google_compute_instance_template.nginx_template", returnStatus: true)
-                        if (destroyResult != 0) {
-                            error("Failed to destroy existing instance template.")
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Terraform Action') {
             steps {
                 script {
-                    def result = sh(script: "terraform ${params.ACTION} --auto-approve", returnStatus: true)
-                    if (result != 0) {
-                        error("Terraform action failed with status: ${result}")
+                    if (params.ACTION == 'destroy') {
+                        input 'Proceed to Destroy Resources?'
                     }
                 }
+                sh "terraform ${params.ACTION} --auto-approve"
             }
+        }
+    }
+
+    post {
+        always {
+            // Optional: Clean up or log outputs
+            echo 'Pipeline finished.'
         }
     }
 }
