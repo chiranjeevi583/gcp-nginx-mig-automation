@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        SVC_ACCOUNT_KEY = credentials('TERRAFORM-AUTHE') 
+        SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
     }
 
     stages {
@@ -62,7 +62,7 @@ pipeline {
         stage('Debug') {
             steps {
                 sh 'echo "Service Account Key exists: ${SVC_ACCOUNT_KEY != null}"'
-                sh 'cat ./terraform.json' // Caution: Avoid exposing sensitive information!
+                sh 'cat ./terraform.json'
             }
         }
     }
