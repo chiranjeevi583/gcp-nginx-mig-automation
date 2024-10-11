@@ -1,9 +1,7 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select the Terraform action to perform')
-    }
+
 
     environment {
         SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
@@ -46,11 +44,7 @@ pipeline {
             }
         }
 		
-        stage('Terraform plan') {
-            steps {
-                sh 'terraform plan'
-            }
-        }
+
         
         stage('Terraform Action') {
             steps {
@@ -58,12 +52,6 @@ pipeline {
             }
         }
         
-        // Optional Debug Stage
-        stage('Debug') {
-            steps {
-                sh 'echo "Service Account Key exists: ${SVC_ACCOUNT_KEY != null}"'
-                sh 'cat ./terraform.json'
-            }
-        }
+      
     }
 }
