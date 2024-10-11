@@ -1,7 +1,7 @@
 pipeline {
     agent any
 	
-	parameters {
+    parameters {
         choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select the Terraform action to perform')
     }
 
@@ -10,18 +10,15 @@ pipeline {
     }
 
     stages {
-          
-
-	stage('Set Terraform path') {
+        stage('Set Terraform path') {
             steps {
                 script {
                     def tfHome = tool name: 'Terraform'
                     env.PATH = "${tfHome}:${env.PATH}"
                 }
-		    sh 'pwd'
+                sh 'pwd'
                 sh 'echo $SVC_ACCOUNT_KEY | base64 -d > ./terraform.json'
                 sh 'terraform --version'               
-               
             }
         }
 
@@ -42,24 +39,24 @@ pipeline {
                 sh 'bash create_managed_instance_group.sh'
             }
         }
-         stage('Initialize Terraform') {
-		  steps {
-		 
+        
+        stage('Initialize Terraform') {
+            steps {
                 sh 'terraform init'
-	 }
-	 }
+            }
+        }
 		
-	stage('Terraform plan') {
-		 steps {
-		
-		 sh 'terraform plan'
-	}
-	}
-       stage('Terraform Action') {
-		 steps {
-		
-		 sh 'terraform $ACTION --auto-approve'
-	}
-	}
+        stage('Terraform plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+        
+        stage('Terraform Action') {
+            steps {
+                // Use double quotes to allow parameter substitution
+                sh "terraform ${params.ACTION} --auto-approve"
+            }
+        }
     }
 }
