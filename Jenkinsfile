@@ -6,10 +6,21 @@ pipeline {
     }
 
     environment {
-        SVC_ACCOUNT_KEY = credentials('TERRAFORM-AUTHE') 
+        SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
     }
 
     stages {
+        stage('Set Terraform path') {
+            steps {
+                script {
+                    // Set the PATH to include the Terraform binary location
+                    env.PATH = "/usr/bin:${env.PATH}"
+                }
+                // Verify that Terraform is accessible
+                sh 'terraform --version'
+            }
+        }
+
         stage('Set up Service Account and Auth') {
             steps {
                 sh 'bash setup_service_account.sh'
