@@ -1,6 +1,6 @@
 pipeline {
     agent any
-	
+
     parameters {
         choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select the Terraform action to perform')
     }
@@ -17,7 +17,7 @@ pipeline {
                     env.PATH = "${tfHome}:${env.PATH}"
                 }
                 sh 'pwd'
-                sh 'echo $SVC_ACCOUNT_KEY | base64 -d > ./terraform.json'
+                sh "echo ${SVC_ACCOUNT_KEY} | base64 -d > ./terraform.json"
                 sh 'terraform --version'               
             }
         }
@@ -54,8 +54,15 @@ pipeline {
         
         stage('Terraform Action') {
             steps {
-                // Use double quotes to allow parameter substitution
                 sh "terraform ${params.ACTION} --auto-approve"
+            }
+        }
+        
+        // Optional Debug Stage
+        stage('Debug') {
+            steps {
+                sh 'echo "Service Account Key exists: ${SVC_ACCOUNT_KEY != null}"'
+                sh 'cat ./terraform.json' // Caution: Avoid exposing sensitive information!
             }
         }
     }
