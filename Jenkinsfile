@@ -17,7 +17,7 @@ pipeline {
                     env.PATH = "/usr/bin:${env.PATH}"
                 }
                 // Verify that Terraform is accessible
-                sh 'terraform --version'
+                sh 'Terraform --version'
             }
         }
 
