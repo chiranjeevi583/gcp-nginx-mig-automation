@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        SVC_ACCOUNT_KEY = credentials('YOUR-SERVICE-ACCOUNT-KEY') 
+        SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
     }
 
     stages {
