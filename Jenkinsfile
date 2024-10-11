@@ -1,6 +1,9 @@
 pipeline {
     agent any
-
+	
+	parameters {
+        choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select the Terraform action to perform')
+    }
 
     environment {
         SVC_ACCOUNT_KEY = credentials('TERRAFORM-AUTHE') 
