@@ -1,8 +1,6 @@
 pipeline {
     agent any
 
-
-
     environment {
         SVC_ACCOUNT_KEY = credentials('NGINX-MIG-AUTH') 
     }
@@ -43,15 +41,30 @@ pipeline {
                 sh 'terraform init'
             }
         }
-		
 
-        
-        stage('Terraform Action') {
+        stage('Destroy Existing Instance Template') {
             steps {
-                sh "terraform ${params.ACTION} --auto-approve"
+                script {
+                    // Only run if ACTION is 'apply'
+                    if (params.ACTION == 'apply') {
+                        def destroyResult = sh(script: "terraform destroy -auto-approve -target=google_compute_instance_template.nginx_template", returnStatus: true)
+                        if (destroyResult != 0) {
+                            error("Failed to destroy existing instance template.")
+                        }
+                    }
+                }
             }
         }
-        
-      
+
+        stage('Terraform Action') {
+            steps {
+                script {
+                    def result = sh(script: "terraform ${params.ACTION} --auto-approve", returnStatus: true)
+                    if (result != 0) {
+                        error("Terraform action failed with status: ${result}")
+                    }
+                }
+            }
+        }
     }
 }
