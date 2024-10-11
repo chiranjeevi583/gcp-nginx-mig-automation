@@ -34,9 +34,12 @@ resource "google_compute_instance_template" "nginx_template" {
 resource "google_compute_instance_group_manager" "nginx_group" {
   name               = "nginx-group"
   base_instance_name = "nginx"
-  instance_template  = google_compute_instance_template.nginx_template.self_link
   zone               = "us-central1-c"
   target_size        = 3  # Define how many instances to start
+
+  version {
+    instance_template = google_compute_instance_template.nginx_template.self_link
+  }
 
   # Auto-scaling configuration can be added if needed
 }
@@ -45,4 +48,3 @@ resource "google_compute_instance_group_manager" "nginx_group" {
 output "instance_group_external_ips" {
   value = google_compute_instance_group_manager.nginx_group.instance_group
 }
-
