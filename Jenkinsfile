@@ -55,17 +55,4 @@ pipeline {
         }
     }
 
-    // Post actions to handle success/failure
-    post {
-        success {
-            echo 'Terraform action completed successfully.'
-        }
-        failure {
-            echo 'There was an error during the Terraform action.'
-        }
-        always {
-            // Cleanup actions or notifications can be added here
-            sh 'rm -f ./terraform.json' // Clean up the service account key
-        }
-    }
 }
