@@ -18,23 +18,7 @@ pipeline {
             }
         }
 
-        stage('Set up Service Account and Auth') {
-            steps {
-                sh 'bash setup_service_account.sh'
-            }
-        }
-
-        stage('Create Instance Template with NGINX') {
-            steps {
-                sh 'bash create_instance_template.sh'
-            }
-        }
-
-        stage('Create Managed Instance Group') {
-            steps {
-                sh 'bash create_managed_instance_group.sh'
-            }
-        }
+       
         
         stage('Initialize Terraform') {
             steps {
