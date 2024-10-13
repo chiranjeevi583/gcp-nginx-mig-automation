@@ -59,7 +59,7 @@ pipeline {
        stage('Terraform Action') {
 		 steps {
 		
-		 sh 'terraform Action --auto-approve'
+		 sh 'terraform $ACTION --auto-approve'
 	}
 	}
     }
